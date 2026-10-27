@@ -28,14 +28,6 @@ tik() {
 
 veeg() { adb shell input swipe 540 1700 540 600 300; sleep 2; }
 
-# Telefoon op Nederlands.
-adb root >/dev/null 2>&1; sleep 3
-adb shell "setprop persist.sys.locale nl-NL; setprop ctl.restart zygote"
-sleep 25
-adb wait-for-device
-until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; do sleep 2; done
-sleep 5
-
 adb install -r -g Kadans.apk || exit 1
 adb shell pm grant $P android.permission.ACCESS_FINE_LOCATION 2>/dev/null
 adb shell pm grant $P android.permission.POST_NOTIFICATIONS 2>/dev/null
