@@ -1,0 +1,35 @@
+name: Kadans op Android
+# Start een Android-emulator, zet de nieuwste Kadans erop en maakt schermafbeeldingen.
+# Er staat hier geen broncode: de APK komt van kadans-apk.vercel.app, net als voor elke tester.
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: KVM aanzetten voor de emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: APK ophalen
+        run: curl -sL -o Kadans.apk https://kadans-apk.vercel.app/Kadans.apk && ls -la Kadans.apk
+      - name: Emulator en test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash rondje.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schermen
+          path: uit/
