@@ -31,6 +31,8 @@ veeg() { adb shell input swipe 540 1700 540 600 300; sleep 2; }
 adb install -r -g Kadans.apk || exit 1
 adb shell pm grant $P android.permission.ACCESS_FINE_LOCATION 2>/dev/null
 adb shell pm grant $P android.permission.POST_NOTIFICATIONS 2>/dev/null
+# Kadans in het Nederlands, via de taal per app (Android 13 en nieuwer).
+adb shell cmd locale set-app-locales $P --user 0 --locales nl-NL || echo "   (taal per app lukte niet)"
 adb logcat -c
 adb shell monkey -p $P -c android.intent.category.LAUNCHER 1 >/dev/null
 sleep 25
