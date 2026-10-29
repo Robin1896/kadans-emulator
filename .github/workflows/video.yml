@@ -1,0 +1,35 @@
+name: Kadans video voor Play
+# Neemt een schermopname van een training op de Android-emulator (voor de Play-verklaring).
+on:
+  workflow_dispatch:
+  push:
+    paths: [video.sh, .github/workflows/video.yml]
+
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: KVM aanzetten voor de emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: APK ophalen
+        run: curl -sL -o Kadans.apk https://kadans-apk.vercel.app/Kadans.apk && ls -la Kadans.apk
+      - name: Emulator en opname
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash video.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video
+          path: uit/
