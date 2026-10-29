@@ -31,8 +31,14 @@ REC=$!
 sleep 3
 
 tik "Vandaag" || true
-tik "Start" || tik "Opnemen" || true
-sleep 6
+tik "Start" || true
+sleep 3
+tik "Start" || true
+sleep 8
+adb exec-out screencap -p > uit/lopen-1.png
+adb shell uiautomator dump /sdcard/l.xml >/dev/null 2>&1; adb pull /sdcard/l.xml uit/lopen-1.xml >/dev/null 2>&1
+echo "teksten: $(grep -o "text=\"[^\"]+\"" uit/lopen-1.xml | tr "
+" "|")"
 # de GPS laten bewegen zodat tijd en afstand oplopen
 for i in 1 2 3 4 5 6 7 8; do
   adb emu geo fix $(echo "5.1376 + 0.0004*$i" | bc -l) 51.4859 || true
@@ -58,6 +64,9 @@ for i in 9 10 11 12 13 14 15 16; do
   sleep 2
 done
 adb exec-out screencap -p > uit/na-scherm-aan.png
+adb shell uiautomator dump /sdcard/l.xml >/dev/null 2>&1; adb pull /sdcard/l.xml uit/na-scherm-aan.xml >/dev/null 2>&1
+echo "teksten2: $(grep -o "text=\"[^\"]+\"" uit/na-scherm-aan.xml | tr "
+" "|")"
 
 # stoppen
 tik "Stop" || tik "Pauze" || true
